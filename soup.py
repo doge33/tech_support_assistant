@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 from pathlib import Path
 from markdownify import markdownify
+from urllib.parse import urljoin
 
 def download_site(url):
     """use requests to download documentation sites"""
@@ -11,17 +12,10 @@ def download_site(url):
     }
     response = requests.get(url, headers=headers)
 
-    # print("Status:", response.status_code)
-    # print("Final URL:", response.url)
-    # print("Contains main-content:", "main-content" in response.text)
-
-    # # Save the downloaded HTML for inspection
-    # Path("downloaded-page.html").write_bytes(response.content)
-
 
     soup = BeautifulSoup(response.content, "html.parser" )
     title = soup.title.string if soup.title else "No title found"
-    #links = soup.find_all("a") 
+    links = soup.find_all("a", href=True) 
     article = soup.select_one("#main-content .article-layout section")
 
     if article is None:
@@ -29,6 +23,9 @@ def download_site(url):
 
     for irrelevant in article(["script", "style", "img", "input"]):
         irrelevant.decompose()
+    
+    for link in links:
+        link["href"] = urljoin(url, link["href"])
 
     text = markdownify(str(article), heading_style="ATX")
 
