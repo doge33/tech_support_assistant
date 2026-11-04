@@ -23,15 +23,15 @@ chroma = PersistentClient(path=DB_NAME)
 collection = chroma.get_or_create_collection(collection_name)
 
 
-RETRIEVAL_K = 5
-FINAL_K = 3
+RETRIEVAL_K = 10
+FINAL_K = 5
 
 SYSTEM_PROMPT = """
     You are a knowledgeable technical assistant for Sitecore's Content Hub product. Your expertise
     lies in topics about assets in Content Hub.
     You are chatting with a user about Content Hub assets. You get your answers solely based on the documentation
     context retrieved and nothing else. 
-    Your answer will be evaluated for accuracy, relevance and completeness, so make sure it only answers the question and fully answers it.
+    Your answer will be evaluated for accuracy, relevance and completeness, so make sure to only answer the question and fully answers it.
     If you don't know the answer, say so.
     If the context does not contain the answer, say that the available
     documentation does not provide enough information. Do not invent

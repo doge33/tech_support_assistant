@@ -182,9 +182,9 @@ def evaluate_all_answers():
     tests = load_tests()
     total_tests = len(tests)
     for index, test in enumerate(tests):
-        result = evaluate_answer(test)[0]
+        result, generated_answer, retrieved_docs = evaluate_answer(test)
         progress = (index + 1) / total_tests
-        yield test, result, progress
+        yield test, result, generated_answer, retrieved_docs, progress
 
 
 # def run_cli_evaluation(test_number: int):

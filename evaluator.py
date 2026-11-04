@@ -148,8 +148,8 @@ def run_answer_evaluation(progress=gr.Progress()):
     all_feedback = []
     question_context = []
 
-    #for test, result, generated_answer, retrieved_docs, prog_value in evaluate_all_answers():
-    for test, result, prog_value in evaluate_all_answers():
+    for test, result, generated_answer, retrieved_docs, prog_value in evaluate_all_answers():
+    #for test, result, prog_value in evaluate_all_answers():
         count += 1
         total_accuracy += result.accuracy
         total_completeness += result.completeness
@@ -159,7 +159,35 @@ def run_answer_evaluation(progress=gr.Progress()):
 
         # Update progress bar only
         progress(prog_value, desc=f"Evaluating test {count}...")
-
+                # we need to add test question, answer feedback and scores(from result) 
+        question = test.question
+        sample_answer = test.reference_answer
+        answer_generated = generated_answer
+        print("\n=== ANSWER GOING INTO UI TABLE ===", flush=True)
+        print("Question:", test.question, flush=True)
+        print("Answer:", generated_answer, flush=True)
+        print("Judge feedback:", result.feedback, flush=True)
+        answer_feedback = result.feedback
+        answer_accuracy = result.accuracy
+        answer_completeness = result.completeness
+        answer_relevance = result.relevance
+        retrieved_docs = retrieved_docs
+        all_feedback.append({
+            "question": question,
+            "sample_answer": sample_answer,
+            "answer_generated": answer_generated,
+            "answer_feedback": answer_feedback,
+            "category": test.category,
+            "answer_accuracy": answer_accuracy,
+            "answer_completeness": answer_completeness,
+            "answer_relevance": answer_relevance,
+            #"retrieved_docs": retrieved_docs,
+        })
+        
+        question_context.append({
+            "question": question,
+            "retrieved_docs": format_context(retrieved_docs),
+        })
         # we need to add test question, answer feedback and scores(from result) 
         #
         # print("\n=== ANSWER GOING INTO UI TABLE ===", flush=True)
@@ -192,13 +220,13 @@ def run_answer_evaluation(progress=gr.Progress()):
 
     df = pd.DataFrame(category_data)
 
-    #df_feedback = pd.DataFrame(all_feedback)
+    df_feedback = pd.DataFrame(all_feedback)
     
 
-    #df_context = pd.DataFrame(question_context)
+    df_context = pd.DataFrame(question_context)
 
-    # return final_html, df, df_feedback, df_context
-    return final_html, df
+    return final_html, df, df_feedback, df_context
+    #return final_html, df
 
 
 def main():
@@ -248,21 +276,21 @@ def main():
                     y_lim=[1, 5],
                     height=400,
                 )
-        # with gr.Row():
-        #     #answer_feedback = gr.Markdown("## 💬 Answer Feedback")
-        #     answer_feedback_table = gr.DataFrame(
-        #         headers = ["Question", "Sample Answer", "Generated Answer", "Feedback", "Accuracy", "Completeness", "Relevance"],
-        #         wrap=True,
-        #         max_height=500
-        #     )
-        # with gr.Row():
-        #     #answer_feedback = gr.Markdown("## 💬 Answer Feedback")
-        #     retrieved_docs_table = gr.DataFrame(
-        #         headers = ["Question", "retreived_docs"],
-        #         datatype=["str", "html"],
-        #         wrap=True,
-        #         max_height=1000
-        #     )
+        with gr.Row():
+            #]answer_feedback = gr.Markdown("## 💬 Answer Feedback")
+            answer_feedback_table = gr.DataFrame(
+                headers = ["Question", "Sample Answer", "Generated Answer", "Feedback", "Category","Accuracy", "Completeness", "Relevance"],
+                wrap=True,
+                max_height=500
+            )
+        with gr.Row():
+            #answer_feedback = gr.Markdown("## 💬 Answer Feedback")
+            retrieved_docs_table = gr.DataFrame(
+                headers = ["Question", "retreived_docs"],
+                datatype=["str", "html"],
+                wrap=True,
+                max_height=1000
+            )
         # Wire up the evaluations
         retrieval_button.click(
             fn=run_retrieval_evaluation,
@@ -271,8 +299,8 @@ def main():
 
         answer_button.click(
             fn=run_answer_evaluation,
-            # outputs=[answer_metrics, answer_chart, answer_feedback_table, retrieved_docs_table],
-            outputs = [answer_metrics, answer_chart]
+            outputs=[answer_metrics, answer_chart, answer_feedback_table, retrieved_docs_table],
+            #outputs = [answer_metrics, answer_chart]
         )
 
     app.launch(inbrowser=True)
