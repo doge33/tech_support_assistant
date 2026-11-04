@@ -67,3 +67,22 @@ These results reflect iterative development on a small evaluation set. They do n
 ## Disclaimer
 
 This is an independent portfolio project and is not affiliated with or endorsed by Sitecore.
+
+## Acknowledgments
+
+This project builds on the RAG implementation and evaluation code
+from Ed Donner's LLM Engineering course on Udemy.
+
+### My Contributions
+
+- Adapted the application to Sitecore Content Hub asset-management documentation.
+- Built the documentation scraping and HTML-to-Markdown conversion pipeline.
+- Created a domain-specific evaluation set with AI assistance.
+- Extended the Gradio evaluation dashboard to show generated answers,
+  reference answers, judge feedback, individual scores, and retrieved
+  chunks for each question.
+- Used the detailed evaluation results to diagnose missing procedure
+  steps and improve retrieval settings and chunk sizes.
+
+The underlying RAG and evaluation implementation is adapted from
+the course.
